@@ -8,7 +8,7 @@ namespace CRUD_in_CSharp_2022
     public partial class FromCrud : Form
     {
 
-        SqlConnection conn;
+        static SqlConnection conn;
         SqlCommand cmd;
         SqlDataReader dtread;
 
@@ -18,13 +18,17 @@ namespace CRUD_in_CSharp_2022
             InitializeComponent();
         }
 
-        private void FromCrud_Load(object sender, EventArgs e)
+        void DbConnection()
         {
-
             conn = new SqlConnection(@"Data Source=RYMV\SQLEXPRESS;Initial Catalog=CRUDExperimental;Persist Security Info=True;User ID=sa;Password=msadmin");
 
             conn.Open();
+        }
 
+
+        private void FromCrud_Load(object sender, EventArgs e)
+        {
+            DbConnection();
         }
 
         private void btnInsert_Click(object sender, EventArgs e)
@@ -43,6 +47,8 @@ namespace CRUD_in_CSharp_2022
                 else
                 {
                     dtread.Close();
+
+                    DbConnection();
 
                     cmd = new SqlCommand("insert into productinfo values(@ProductID, @ItemName, @Model, @Color, getdate(), NULL)", conn);
                     cmd.Parameters.AddWithValue("ProductID", int.Parse(txtProdId.Text));
@@ -79,6 +85,8 @@ namespace CRUD_in_CSharp_2022
             {
                 if (dataGridView != null || dataGridView.Rows.Count != 0)
                 {
+                    DbConnection();
+
                     cmd = new SqlCommand("update productinfo set ItemName = '" + txtItem.Text + "', Model = '" + txtModel.Text + "', Color = '" + cmbColor.Text + "', UpdateDate = getDate() where ProductID = '" + int.Parse(txtProdId.Text) + "'", conn);
 
                     cmd.ExecuteNonQuery();
@@ -102,6 +110,8 @@ namespace CRUD_in_CSharp_2022
             {
                 if (dataGridView != null || dataGridView.Rows.Count != 0)
                 {
+                    DbConnection();
+
                     cmd = new SqlCommand("select * from productinfo where ProductID = '" + int.Parse(txtSearch.Text) + "' ", conn);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
@@ -125,17 +135,18 @@ namespace CRUD_in_CSharp_2022
         {
             if (txtSearch.Text != string.Empty)
             {
+
                 cmd = new SqlCommand("select * from productinfo where ProductID = '" + int.Parse(txtSearch.Text) + "' ", conn);
-                dtread = cmd.ExecuteReader();
 
-                if (dtread.Read())
+                if (dataGridView != null || dataGridView.Rows.Count != 0)
                 {
-                    dtread.Close();
-
                     DialogResult dialogResult = MessageBox.Show("Once deleted, it cannot be retrieved again.", "OK to Continue", MessageBoxButtons.OKCancel);
 
                     if (dialogResult == DialogResult.OK)
                     {
+
+                        DbConnection();
+
                         cmd = new SqlCommand("delete from productinfo where ProductID = '" + int.Parse(txtSearch.Text) + "'", conn);
                         cmd.ExecuteNonQuery();
                         conn.Close();
@@ -144,6 +155,7 @@ namespace CRUD_in_CSharp_2022
                     }
                     else if (dialogResult == DialogResult.Cancel)
                     {
+                        DbConnection();
 
                         cmd = new SqlCommand("select * from productinfo where ProductID = '" + int.Parse(txtSearch.Text) + "'", conn);
                         SqlDataAdapter da = new SqlDataAdapter(cmd);
