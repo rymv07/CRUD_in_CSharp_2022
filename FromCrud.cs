@@ -37,15 +37,19 @@ namespace CRUD_in_CSharp_2022
             if (txtProdId.Text != string.Empty)
             {
                 cmd = new SqlCommand("select * from productinfo where ProductID = '" + int.Parse(txtProdId.Text) + "' ", conn);
+                
                 dtread = cmd.ExecuteReader();
+
 
                 if (dtread.Read())
                 {
                     dtread.Close();
+
                     MessageBox.Show("Product ID already exist!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
+
                     dtread.Close();
 
                     DbConnection();
